@@ -2,7 +2,7 @@ import * as assert from 'assert'
 import { Context } from 'egg'
 import { app } from 'egg-mock/bootstrap'
 
-describe('test/app/service/Test.test.js', () => {
+describe('test/app/service/demo.test.js', () => {
     let ctx: Context
 
     before(async () => {
@@ -10,7 +10,7 @@ describe('test/app/service/Test.test.js', () => {
     })
 
     it('sayHi', async () => {
-        const result = await ctx.service.test.sayHi('egg')
+        const result = await ctx.service.demo.sayHi('egg')
         assert(result === 'hi, egg')
     })
 })

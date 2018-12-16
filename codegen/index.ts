@@ -1,5 +1,5 @@
-import fs from 'fs'
-import shell from 'shelljs'
+import * as fs from 'fs'
+import * as shell from 'shelljs'
 import client from '../util/client'
 import {
     Package,
