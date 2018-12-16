@@ -130,7 +130,7 @@ function generate(pack: Package) {
     const controllerDir = `${__dirname}/dist/controller`
     const serviceDir = `${__dirname}/dist/service`
     const typeDir = `typings/app/proto`
-    recreateFolder(controllerDir, serviceDir, typeDir)
+    recreateDirs(controllerDir, serviceDir, typeDir)
 
     /**
      * generate router
@@ -244,7 +244,7 @@ function upodateMethodsMessages(pack: Package) {
     return pack
 }
 
-function recreateFolder(...dirs: string[]) {
+function recreateDirs(...dirs: string[]) {
     dirs.forEach(dir => {
         shell.exec(`rm -rf ${dir}`)
         shell.exec(`mkdir -p ${dir}`)

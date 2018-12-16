@@ -3,10 +3,9 @@
     "compilerOptions": {
         "target": "es2017",
         "module": "commonjs",
-        "strict": true,
-        "noImplicitAny": false,
-        "experimentalDecorators": true,
+        "noImplicitAny": true,
         "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
         "charset": "utf8",
         "allowJs": false,
         "pretty": true,

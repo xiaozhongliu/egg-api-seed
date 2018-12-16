@@ -1,14 +1,12 @@
+run/
 logs/
+.DS_Store
 npm-debug.log
 package-lock.json
 node_modules/
 coverage/
 .idea/
-run/
-logs/
-.DS_Store
 *.swp
-*.lock
 *.js
 
 app/**/*.js
