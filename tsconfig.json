@@ -3,6 +3,7 @@
     "compilerOptions": {
         "target": "es2017",
         "module": "commonjs",
+        "esModuleInterop": true,
         "strict": true,
         "noImplicitAny": false,
         "experimentalDecorators": true,

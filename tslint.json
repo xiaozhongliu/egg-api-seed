@@ -16,13 +16,7 @@
             "single",
             "jsx-double"
         ],
-        "no-console": [
-            true,
-            "dir",
-            "log",
-            "error",
-            "warn"
-        ],
+        "no-console": false,
         "space-before-function-paren": false,
         "interface-name": [
             true,
@@ -50,6 +44,9 @@
         "align": [
             true,
             "statements"
-        ]
+        ],
+        "ordered-imports": false,
+        "max-line-length": false,
+        "radix": false
     }
 }
