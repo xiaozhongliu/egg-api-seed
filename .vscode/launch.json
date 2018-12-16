@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch Egg",
+            "name": "tsnode",
             "type": "node",
             "request": "launch",
             "cwd": "${workspaceRoot}",
@@ -28,6 +28,19 @@
                 "<node_internals>/**/*.js",
                 "${workspaceRoot}/node_modules/**/*.js"
             ]
-        }
+        },
+        {
+            "name": "codegen",
+            "type": "node",
+            "request": "launch",
+            "protocol": "inspector",
+            "runtimeArgs": [
+                "-r",
+                "ts-node/register"
+            ],
+            "args": [
+                "${workspaceFolder}/codegen/index.ts"
+            ]
+        },
     ]
 }

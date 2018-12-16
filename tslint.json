@@ -47,6 +47,7 @@
         ],
         "ordered-imports": false,
         "max-line-length": false,
-        "radix": false
+        "radix": false,
+        "arrow-parens": false
     }
 }
