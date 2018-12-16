@@ -133,11 +133,32 @@ function generate(pack: Package) {
     recreateFolder(controllerDir, serviceDir, typeDir)
 
     /**
+     * generate router
+     */
+    let stream = fs.createWriteStream(`${__dirname}/dist/router.ts`)
+    stream.write(`import { Application } from 'egg'\n
+export default (app: Application) => {\n
+    const { controller, router } = app
+    router.get('/', controller.home.index)
+
+    const rp = app.router.namespace('/${pack.name}')`)
+
+    pack.services.forEach(service => {
+        for (const method of service.methods) {
+            stream.write(`\n    rp.get('/${method.name}', controller.${service.name.toLowerCase()}.${method.name})`)
+        }
+    })
+
+    stream.write('\n}\n')
+    stream.end()
+    console.log('\ngenerated router:', 'router.ts')
+
+    /**
      * generate controller and service
      */
     pack.services.forEach(service => {
         const fileName = `${service.name.toLowerCase()}.ts`
-        let stream = fs.createWriteStream(`${controllerDir}/${fileName}`)
+        stream = fs.createWriteStream(`${controllerDir}/${fileName}`)
 
         stream.write(`import { Controller } from 'egg'\n
 export default class ${service.name}Controller extends Controller {`)
@@ -152,7 +173,7 @@ export default class ${service.name}Controller extends Controller {`)
 
         stream.write('\n}\n')
         stream.end()
-        console.log('\ngenerated controller:', fileName)
+        console.log('generated controller:', fileName)
 
         // ---
 
