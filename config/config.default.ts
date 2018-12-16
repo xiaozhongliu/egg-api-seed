@@ -12,6 +12,16 @@ export default (appInfo: EggAppInfo) => {
 
         // add your special config in here
         sourceUrl: `https://github.com/eggjs/examples/tree/master/${appInfo.name}`,
+
+        grpcClient: {
+            clients: {
+                default: {
+                    protoPath: 'proto',
+                    host: '0.0.0.0',
+                    port: '50051',
+                },
+            },
+        },
     }
     return config
 }

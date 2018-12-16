@@ -165,7 +165,7 @@ export default class ${service.name}Controller extends Controller {`)
 
         for (const method of service.methods) {
             stream.write(`\n
-    public async ${ method.name}() {
+    public async ${method.name}() {
         const { ctx } = this
         ctx.body = await ctx.service.${service.name.toLowerCase()}.${method.name}(${method.response.properties.map(() => 'null').join(',')})
     }`)
@@ -180,12 +180,13 @@ export default class ${service.name}Controller extends Controller {`)
         stream = fs.createWriteStream(`${serviceDir}/${fileName}`)
 
         stream.write(`import { Service } from 'egg'\n
-export default class ${service.name} extends Service {`)
+export default class ${service.name} extends Service {\n
+    readonly service = this.app.grpcClient.get('default').${pack.name}.${service.name}`)
 
         for (const method of service.methods) {
             stream.write(`\n
-    public async ${ method.name}(${method.response.properties.map(property => `${property.name}: ${property.type}`).join(',')}) {
-        return { ${method.response.properties.map(property => property.name).join(', ')} }
+    public async ${method.name}(${method.response.properties.map(property => `${property.name}: ${property.type}`).join(',')}) {
+        return this.service.${method.name}(${method.response.properties.map(property => property.name).join(', ')})
     }`)
         }
 
