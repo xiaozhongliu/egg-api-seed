@@ -129,7 +129,7 @@ function generate(pack: Package) {
 
     const controllerDir = `${__dirname}/dist/controller`
     const serviceDir = `${__dirname}/dist/service`
-    const typeDir = `type/${pack.name}`
+    const typeDir = `typings/app/proto`
     recreateFolder(controllerDir, serviceDir, typeDir)
 
     /**
@@ -167,7 +167,7 @@ export default class ${service.name}Controller extends Controller {`)
             stream.write(`\n
     public async ${method.name}() {
         const { ctx } = this
-        ctx.body = await ctx.service.${service.name.toLowerCase()}.${method.name}(${method.response.properties.map(() => 'null').join(',')})
+        ctx.body = await ctx.service.${service.name.toLowerCase()}.${method.name}(${method.request.properties.map(() => 'null').join(',')})
     }`)
         }
 
@@ -185,8 +185,8 @@ export default class ${service.name} extends Service {\n
 
         for (const method of service.methods) {
             stream.write(`\n
-    public async ${method.name}(${method.response.properties.map(property => `${property.name}: ${property.type}`).join(',')}) {
-        return this.service.${method.name}(${method.response.properties.map(property => property.name).join(', ')})
+    public async ${method.name}(${method.request.properties.map(property => `${property.name}: ${property.type}`).join(',')}) {
+        return this.service.${method.name}({ ${method.request.properties.map(property => property.name).join(', ')} })
     }`)
         }
 

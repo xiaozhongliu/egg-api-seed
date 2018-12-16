@@ -4,11 +4,11 @@ export default class Greeter extends Service {
 
     readonly service = this.app.grpcClient.get('default').greeter.Greeter
 
-    public async sayHello(message: string) {
-        return this.service.sayHello(message)
+    public async sayHello(name: string) {
+        return this.service.sayHello({ name })
     }
 
-    public async sayGoodbye(message: string) {
-        return this.service.sayGoodbye(message)
+    public async sayGoodbye(name: string) {
+        return this.service.sayGoodbye({ name })
     }
 }
