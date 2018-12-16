@@ -8,6 +8,7 @@
             "name": "tsnode",
             "type": "node",
             "request": "launch",
+            "protocol": "auto",
             "cwd": "${workspaceRoot}",
             "runtimeExecutable": "npm",
             "runtimeArgs": [
@@ -21,7 +22,6 @@
             },
             "autoAttachChildProcesses": true,
             "console": "integratedTerminal",
-            "protocol": "auto",
             "restart": true,
             "port": 9229,
             "skipFiles": [
