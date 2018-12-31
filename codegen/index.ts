@@ -129,11 +129,11 @@ function generate(pack: Package) {
 
     const controllerDir = `${__dirname}/dist/controller`
     const serviceDir = `${__dirname}/dist/service`
-    const typeDir = `typings/app/proto`
-    recreateDirs(controllerDir, serviceDir, typeDir)
+    const protoDir = `${__dirname}/dist/proto`
+    recreateDirs(controllerDir, serviceDir, protoDir)
 
     /**
-     * generate router
+     * generate routes
      */
     let stream = fs.createWriteStream(`${__dirname}/dist/router.ts`)
     stream.write(`import { Application } from 'egg'\n
@@ -153,10 +153,10 @@ export default (app: Application) => {\n
     stream.end()
     console.log('\ngenerated router:', 'router.ts')
 
-    /**
-     * generate controller and service
-     */
     pack.services.forEach(service => {
+        /**
+         * generate controller
+         */
         const fileName = `${service.name.toLowerCase()}.ts`
         stream = fs.createWriteStream(`${controllerDir}/${fileName}`)
 
@@ -175,13 +175,14 @@ export default class ${service.name}Controller extends Controller {`)
         stream.end()
         console.log('generated controller:', fileName)
 
-        // ---
-
+        /**
+         * generate service
+         */
         stream = fs.createWriteStream(`${serviceDir}/${fileName}`)
 
         stream.write(`import { Service } from 'egg'\n
 export default class ${service.name} extends Service {\n
-    readonly service = this.app.grpcClient.get('default').${pack.name}.${service.name}`)
+    readonly service: ${service.name}Service = this.app.grpcClient.get('default').${pack.name}.${service.name}`)
 
         for (const method of service.methods) {
             stream.write(`\n
@@ -193,35 +194,40 @@ export default class ${service.name} extends Service {\n
         stream.write('\n}\n')
         stream.end()
         console.log('generated service:', fileName)
+
+        /**
+         * generate service type
+         */
+        shell.exec(`mkdir -p ${protoDir}/${service.package}`)
+        const serviceTypeFileName = `${service.package}/${service.name}Service.d.ts`
+        stream = fs.createWriteStream(`${protoDir}/${serviceTypeFileName}`)
+
+        stream.write(`interface ${service.name}Service {
+${service.methods.map(method => `    ${method.name}(request: ${method.request.name}): ${method.response.name}`).join('\n')}
+}\n`,
+        )
+
+        stream.end()
+        console.log('generated type: %s', serviceTypeFileName)
+
+        /**
+         * generate message types
+         */
+        service.methods.forEach(method => {
+            [method.request, method.response].forEach(message => {
+                const messageTypeFileName = `${service.package}/${message.name}.d.ts`
+                stream = fs.createWriteStream(`${protoDir}/${messageTypeFileName}`)
+
+                stream.write(`interface ${message.name} {
+${message.properties.map(property => `    ${property.name}: ${property.type}`).join('\n')}
+}\n`,
+                )
+
+                stream.end()
+                console.log('generated type: %s', messageTypeFileName)
+            })
+        })
     })
-
-    /**
-     * generate types
-     */
-    //     pack.messages.forEach(message => {
-    //         const isRequestType = message.name.includes('Request')
-    //         const fileName = `${message.name}${isRequestType ? '.d' : ''}.ts`
-    //         const stream = fs.createWriteStream(`${typeDir}/${fileName}`)
-
-    //         if (isRequestType) {
-    //             stream.write(`interface ${message.name} extends Req {\n
-    //     body: {${ message.properties.map(property => `\n        ${property.name}: ${property.type}`).join()}
-    //     }
-    // }\n`,
-    //             )
-    //         } else {
-    //             stream.write(`export default class ${message.name} {\n
-    //     constructor(${ message.properties.map(property => `${property.name}: ${property.type}`).join(', ')}) {
-    // ${ message.properties.map(property => `        this.${property.name} = ${property.name}`).join('\n')}
-    //     }
-    // ${ message.properties.map(property => `\n    ${property.name}: ${property.type}`).join()}
-    // }\n`,
-    //             )
-    //         }
-
-    //         stream.end()
-    //         console.log('generated %s: %s', isRequestType ? 'type' : 'class', fileName)
-    //     })
 }
 
 /**
