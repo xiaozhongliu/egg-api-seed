@@ -1,6 +1,6 @@
 import * as fs from 'fs'
 import * as shell from 'shelljs'
-import client from '../util/client'
+import { promisify } from 'util'
 import {
     Package,
     Service,
@@ -9,15 +9,22 @@ import {
     Property,
 } from './model'
 
-async function main(proto: string) {
+const readdir = promisify(fs.readdir)
+const readFile = promisify(fs.readFile)
+
+async function main() {
     try {
-        const content = await getOnlineProtoFile(proto)
-        generate(deserialize(content))
+        const protoDir = './app/proto'
+        const protos = await readdir(protoDir)
+        protos.forEach(async proto => {
+            const content = await readFile(`${protoDir}/${proto}`)
+            generate(deserialize(content.toString()))
+        })
     } catch (error) {
         console.log(error)
     }
 }
-main('greeter.proto')
+main()
 
 /**
  * deserialize from proto definition to AST
@@ -60,7 +67,7 @@ function deserialize(content: string): Package {
         }
         if (isParsingService && /rpc\s+/.test(line)) {
             // @ts-ignore
-            const [str, name, req, res] = /rpc\s+(.*?)\s+\((.*?)\)\s+returns\s+\((.*?)\)\s+{}/.exec(line)!
+            const [str, name, req, res] = /rpc\s+(.*?)\s*\((.*?)\)\s*returns\s*\((.*?)\)\s*{}/.exec(line)!
 
             let reqMessage
             let resMessage
@@ -93,7 +100,7 @@ function deserialize(content: string): Package {
          */
         if (!isParsingMessage && line.startsWith('message')) {
             isParsingMessage = true
-            const name = /message\s+(.*?)\s+{/.exec(line)![1]
+            const name = /message\s+(.*?)\s*{/.exec(line)![1]
             currentMessage = pack.messages.find(message => name === message.name)
 
             if (!pack) {
@@ -233,11 +240,6 @@ ${message.properties.map(property => `    ${property.name}: ${property.type}`).j
 /**
  * helper methods
  */
-function getOnlineProtoFile(filename: string) {
-    const url = `https://raw.githubusercontent.com/xiaozhongliu/ts-rpc-seed/master/proto/${filename}`
-    return client.get(url)
-}
-
 function upodateMethodsMessages(pack: Package) {
     for (const { methods } of pack.services) {
         for (const method of methods) {
