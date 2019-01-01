@@ -14,18 +14,30 @@ const readdir = promisify(fs.readdir)
 const readFile = promisify(fs.readFile)
 const controllerDir = `${__dirname}/dist/controller`
 const serviceDir = `${__dirname}/dist/service`
+const router = `${__dirname}/dist/router.ts`
 const protoDir = `${__dirname}/dist/proto`
 
 async function main() {
     try {
         recreateDirs(controllerDir, serviceDir, protoDir)
 
+        const routerStream = fs.createWriteStream(router)
+        routerStream.write(`import { Application } from 'egg'\n
+export default (app: Application) => {\n
+    let rp
+    const { controller, router } = app
+    router.get('/', controller.home.index)`)
+
         const sourceDir = './app/proto'
         const protos = await readdir(sourceDir)
-        protos.forEach(async proto => {
+        for (const proto of protos) {
             const content = await readFile(`${sourceDir}/${proto}`)
-            generate(deserialize(content.toString()))
-        })
+            generate(deserialize(content.toString()), routerStream)
+        }
+
+        routerStream.write('\n}\n')
+        routerStream.end()
+        console.log('\ngenerated router:', 'router.ts')
     } catch (error) {
         console.log(error)
     }
@@ -147,36 +159,26 @@ function deserialize(content: string): Package {
 /**
  * generate ts files from AST
  */
-function generate(pack: Package) {
+function generate(pack: Package, routerStream: fs.WriteStream) {
     console.log('\nfinal AST: ', JSON.stringify(pack, null, '    '))
 
     /**
      * generate routes
      */
-    let stream = fs.createWriteStream(`${__dirname}/dist/router.ts`)
-    stream.write(`import { Application } from 'egg'\n
-export default (app: Application) => {\n
-    const { controller, router } = app
-    router.get('/', controller.home.index)
-
-    const rp = app.router.namespace('/${pack.name}')`)
+    routerStream.write(`\n\n    rp = app.router.namespace('/${pack.name}')`)
 
     pack.services.forEach(service => {
         for (const method of service.methods) {
-            stream.write(`\n    rp.get('/${method.name}', controller.${service.name.toLowerCase()}.${method.name})`)
+            routerStream.write(`\n    rp.get('/${method.name}', controller.${service.name.toLowerCase()}.${method.name})`)
         }
     })
-
-    stream.write('\n}\n')
-    stream.end()
-    console.log('\ngenerated router:', 'router.ts')
 
     pack.services.forEach(service => {
         /**
          * generate controller
          */
         const fileName = `${service.name.toLowerCase()}.ts`
-        stream = fs.createWriteStream(`${controllerDir}/${fileName}`)
+        let stream = fs.createWriteStream(`${controllerDir}/${fileName}`)
 
         stream.write(`import { Controller } from 'egg'\n
 export default class ${service.name}Controller extends Controller {`)
