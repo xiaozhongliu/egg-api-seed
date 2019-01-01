@@ -36,7 +36,7 @@ function deserialize(content: string): Package {
     let isParsingMessage = false
     let currentMessage
 
-    for (const line of content.split('\n')) {
+    for (let line of content.split('\n')) {
 
         /**
          *  parse package
@@ -102,6 +102,10 @@ function deserialize(content: string): Package {
             isParsingMessage = true
             const name = /message\s+(.*?)\s*{/.exec(line)![1]
             currentMessage = pack.messages.find(message => name === message.name)
+            if (!currentMessage) {
+                currentMessage = new Message(name)
+                pack.messages.push(currentMessage)
+            }
 
             if (!pack) {
                 throw new Error(`proto error: unused message [${name}]`)
@@ -110,9 +114,14 @@ function deserialize(content: string): Package {
             continue
         }
         if (isParsingMessage && line !== '}') {
+            const repeated = line.includes('repeated')
+            if (repeated) {
+                line = line.replace('repeated', '')
+            }
             // @ts-ignore
-            const [str, type, name, binaryId] = /\s+(.*?)\s+(.*?)\s+=\s+(.*?);/.exec(line)!
-            const property = new Property(name, type, parseInt(binaryId))
+            const [str, type, name, binaryId] = /\s+(.*?)\s+(.*?)\s*=\s*(.*?);/.exec(line)!
+            const finalType = repeated ? `${type}[]` : type
+            const property = new Property(name, finalType, parseInt(binaryId))
             currentMessage.properties.push(property)
 
             console.log('        parsed property: ', name)
@@ -174,7 +183,7 @@ export default class ${service.name}Controller extends Controller {`)
             stream.write(`\n
     public async ${method.name}() {
         const { ctx } = this
-        ctx.body = await ctx.service.${service.name.toLowerCase()}.${method.name}(${method.request.properties.map(() => 'null').join(',')})
+        ctx.body = await ctx.service.${service.name.toLowerCase()}.${method.name}(${method.request.properties.map(() => 'null').join(', ')})
     }`)
         }
 
@@ -193,7 +202,7 @@ export default class ${service.name} extends Service {\n
 
         for (const method of service.methods) {
             stream.write(`\n
-    public async ${method.name}(${method.request.properties.map(property => `${property.name}: ${property.type}`).join(',')}) {
+    public async ${method.name}(${method.request.properties.map(property => `${property.name}: ${property.type}`).join(', ')}) {
         return this.service.${method.name}({ ${method.request.properties.map(property => property.name).join(', ')} })
     }`)
         }
@@ -220,19 +229,17 @@ ${service.methods.map(method => `    ${method.name}(request: ${method.request.na
         /**
          * generate message types
          */
-        service.methods.forEach(method => {
-            [method.request, method.response].forEach(message => {
-                const messageTypeFileName = `${service.package}/${message.name}.d.ts`
-                stream = fs.createWriteStream(`${protoDir}/${messageTypeFileName}`)
+        pack.messages.forEach(message => {
+            const messageTypeFileName = `${service.package}/${message.name}.d.ts`
+            stream = fs.createWriteStream(`${protoDir}/${messageTypeFileName}`)
 
-                stream.write(`interface ${message.name} {
+            stream.write(`interface ${message.name} {
 ${message.properties.map(property => `    ${property.name}: ${property.type}`).join('\n')}
 }\n`,
-                )
+            )
 
-                stream.end()
-                console.log('generated type: %s', messageTypeFileName)
-            })
+            stream.end()
+            console.log('generated type: %s', messageTypeFileName)
         })
     })
 }
