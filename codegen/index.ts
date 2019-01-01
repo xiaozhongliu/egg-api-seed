@@ -12,13 +12,18 @@ import {
 
 const readdir = promisify(fs.readdir)
 const readFile = promisify(fs.readFile)
+const controllerDir = `${__dirname}/dist/controller`
+const serviceDir = `${__dirname}/dist/service`
+const protoDir = `${__dirname}/dist/proto`
 
 async function main() {
     try {
-        const protoDir = './app/proto'
-        const protos = await readdir(protoDir)
+        recreateDirs(controllerDir, serviceDir, protoDir)
+
+        const sourceDir = './app/proto'
+        const protos = await readdir(sourceDir)
         protos.forEach(async proto => {
-            const content = await readFile(`${protoDir}/${proto}`)
+            const content = await readFile(`${sourceDir}/${proto}`)
             generate(deserialize(content.toString()))
         })
     } catch (error) {
@@ -144,11 +149,6 @@ function deserialize(content: string): Package {
  */
 function generate(pack: Package) {
     console.log('\nfinal AST: ', JSON.stringify(pack, null, '    '))
-
-    const controllerDir = `${__dirname}/dist/controller`
-    const serviceDir = `${__dirname}/dist/service`
-    const protoDir = `${__dirname}/dist/proto`
-    recreateDirs(controllerDir, serviceDir, protoDir)
 
     /**
      * generate routes
