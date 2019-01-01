@@ -104,7 +104,7 @@ function deserialize(content: string): Package {
             const method = new Method(name, reqMessage, resMessage)
             currentService.methods.push(method)
 
-            console.log('        parsing method: ', name)
+            console.log('        parsed method: ', name)
             continue
         }
         if (isParsingService && line === '}') {
@@ -160,7 +160,7 @@ function deserialize(content: string): Package {
  * generate ts files from AST
  */
 function generate(pack: Package, routerStream: fs.WriteStream) {
-    console.log('\nfinal AST: ', JSON.stringify(pack, null, '    '))
+    console.log(`\nfinal AST: ${JSON.stringify(pack, null, '    ')}\n`)
 
     /**
      * generate routes
