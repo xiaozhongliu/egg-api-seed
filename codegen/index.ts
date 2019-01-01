@@ -2,6 +2,7 @@ import * as fs from 'fs'
 import * as shell from 'shelljs'
 import { promisify } from 'util'
 import {
+    Enum,
     Package,
     Service,
     Method,
@@ -119,7 +120,8 @@ function deserialize(content: string): Package {
                 line = line.replace('repeated', '')
             }
             // @ts-ignore
-            const [str, type, name, binaryId] = /\s+(.*?)\s+(.*?)\s*=\s*(.*?);/.exec(line)!
+            const [str, rawType, name, binaryId] = /\s+(.*?)\s+(.*?)\s*=\s*(.*?);/.exec(line)!
+            const type = Enum.TypeMapping[rawType] || rawType
             const finalType = repeated ? `${type}[]` : type
             const property = new Property(name, finalType, parseInt(binaryId))
             currentMessage.properties.push(property)
