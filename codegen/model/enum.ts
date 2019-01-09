@@ -1,4 +1,4 @@
-import { Enum } from '../../typings/enum'
+import { Enum } from '../../typings/custom/enum'
 
 class TypeMapping extends Enum {
     int32 = 'number'
