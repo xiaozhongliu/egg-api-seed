@@ -37,10 +37,7 @@
             true,
             10
         ],
-        "variable-name": [
-            true,
-            "allow-leading-underscore"
-        ],
+        "variable-name": false,
         "align": [
             true,
             "statements"
