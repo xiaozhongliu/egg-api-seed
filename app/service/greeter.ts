@@ -2,7 +2,7 @@ import { Service } from 'egg'
 
 export default class Greeter extends Service {
 
-    readonly service: GreeterService = this.app.grpcClient.get('default').greeter.Greeter
+    readonly service: GreeterService = this.app.grpcClient.main.greeter.Greeter
 
     public async sayHello(name: string) {
         return this.service.sayHello({ name })

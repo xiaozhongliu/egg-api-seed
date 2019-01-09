@@ -1,4 +1,5 @@
 import { EggPlugin } from 'egg'
+import * as path from 'path'
 
 const plugin: EggPlugin = {
 
@@ -8,7 +9,8 @@ const plugin: EggPlugin = {
     },
     grpcClient: {
         enable: true,
-        package: 'egg-grpc-client',
+        package: 'grpc-client',
+        path: path.join(__dirname, '../lib/plugin/grpc-client'),
     },
 }
 export default plugin
