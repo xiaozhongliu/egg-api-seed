@@ -43,29 +43,39 @@ async function getMultiTierServices(app: Application, clientConfig: ClientConfig
         const definition = grpc.loadPackageDefinition(proto)
 
         for (const packName of Object.keys(definition)) {
-            let currentTier
-            const tiers = packName.split('.')
-            for (const tier of tiers) {
-                currentTier = services[tier]
-                if (!currentTier) {
-                    currentTier = services[tier] = {}
-                }
+            if (!services[packName]) {
+                services[packName] = definition[packName]
             }
-
-            const address = `${clientConfig.host}:${clientConfig.port}`
-            const credentials = grpc.credentials.createInsecure()
-            const pack: Indexed = definition[packName]
-            for (const serviceName of Object.keys(pack)) {
-                const ServiceClass = pack[serviceName]
-                const service = new ServiceClass(address, credentials)
-
-                currentTier[serviceName] = service
-                for (const methodName of Object.keys(ServiceClass.service)) {
-                    service[methodName] = util.promisify(service[methodName])
-                }
-            }
+            const tier: Indexed = definition[packName]
+            traverseDefinition(services, tier, packName, clientConfig)
         }
     }
 
     return services
+}
+
+async function traverseDefinition(relevantParent: any, tier: any, tierName: string, clientConfig: ClientConfig) {
+    if (tier.name === 'ServiceClient') {
+        return addServiceClient(relevantParent, tier, tierName, clientConfig)
+    }
+
+    for (const subTierName of Object.keys(tier)) {
+        let relevantCurrent = relevantParent[tierName]
+        if (!relevantCurrent) {
+            relevantCurrent = relevantParent[tierName] = {}
+        }
+        traverseDefinition(relevantCurrent, tier[subTierName], subTierName, clientConfig)
+    }
+}
+
+async function addServiceClient(relevantParent: any, tier: any, tierName: string, clientConfig: ClientConfig) {
+    const ServiceClient = tier
+    const address = `${clientConfig.host}:${clientConfig.port}`
+    const credentials = grpc.credentials.createInsecure()
+    const client = new ServiceClient(address, credentials)
+
+    relevantParent[tierName] = client
+    for (const methodName of Object.keys(ServiceClient.service)) {
+        client[methodName] = util.promisify(client[methodName])
+    }
 }
