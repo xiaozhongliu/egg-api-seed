@@ -1,21 +1,25 @@
-import * as fs from 'fs'
 import * as path from 'path'
 import * as util from 'util'
 import * as grpc from 'grpc'
 import * as loader from '@grpc/proto-loader'
+import { promises as fs, constants } from 'fs'
 import { Application } from 'egg'
+import config from './config'
 
-const exists = util.promisify(fs.exists)
-const readdir = util.promisify(fs.readdir)
+interface ClientConfig {
+    name: string,
+    protoPath: string,
+    host: string,
+    port: number,
+}
 
 export default async (app: Application) => {
     const clientServicesMap: Indexed = {}
-    await Promise.all(
-        app.config.grpcClient.clients.map(async (clientConfig: ClientConfig) => {
-            const services = await getMultiTierServices(app, clientConfig)
-            clientServicesMap[clientConfig.name] = services
-        }),
-    )
+    const clients = app.config.grpcClient.clients || config.clients
+    await Promise.all(clients.map(async (clientConfig: ClientConfig) => {
+        const services = await getMultiTierServices(app, clientConfig)
+        clientServicesMap[clientConfig.name] = services
+    }))
     app.grpcClient = clientServicesMap
 }
 
@@ -23,22 +27,19 @@ async function getMultiTierServices(app: Application, clientConfig: ClientConfig
     const services: Indexed = {}
     const protoDir = path.join(app.baseDir, clientConfig.protoPath)
 
-    if (!await exists(protoDir)) {
+    try {
+        await fs.access(protoDir, constants.F_OK)
+    } catch (error) {
         throw new Error('proto directory not exist')
     }
-    const protoFileList = await readdir(protoDir)
+
+    const protoFileList = await fs.readdir(protoDir)
     for (const protoFile of protoFileList) {
         if (path.extname(protoFile) !== '.proto') { continue }
 
         const proto = await loader.load(
             path.join(protoDir, protoFile),
-            app.config.grpcClient.loaderOption || {
-                keepCase: true,
-                longs: String,
-                enums: String,
-                defaults: true,
-                oneofs: true,
-            },
+            app.config.grpcClient.loaderOption || config.loaderOption,
         )
         const definition = grpc.loadPackageDefinition(proto)
 
@@ -61,10 +62,15 @@ async function traverseDefinition(relevantParent: any, tier: any, tierName: stri
 
     for (const subTierName of Object.keys(tier)) {
         let relevantCurrent = relevantParent[tierName]
+        if (relevantCurrent.format) {
+            return delete relevantParent[tierName]
+        }
         if (!relevantCurrent) {
             relevantCurrent = relevantParent[tierName] = {}
         }
-        traverseDefinition(relevantCurrent, tier[subTierName], subTierName, clientConfig)
+        if (!tier[subTierName].format) {
+            traverseDefinition(relevantCurrent, tier[subTierName], subTierName, clientConfig)
+        }
     }
 }
 

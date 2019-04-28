@@ -1,29 +1,30 @@
 {
     "compileOnSave": true,
     "compilerOptions": {
-        "target": "es2017",
         "module": "commonjs",
+        "target": "es2018",
+        "charset": "utf8",
         "noImplicitAny": true,
+        "esModuleInterop": true,
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
-        "charset": "utf8",
-        "allowJs": false,
-        "pretty": true,
-        "noEmitOnError": false,
-        "noUnusedLocals": true,
-        "noUnusedParameters": true,
-        "allowUnreachableCode": false,
-        "allowUnusedLabels": false,
-        "strictPropertyInitialization": false,
-        "noFallthroughCasesInSwitch": true,
+        "forceConsistentCasingInFileNames": true,
+        "allowSyntheticDefaultImports": true,
+        "noImplicitUseStrict": true,
+        "listEmittedFiles": true,
+        "removeComments": true,
         "skipLibCheck": true,
-        "skipDefaultLibCheck": true,
-        "inlineSourceMap": true,
-        "importHelpers": true
+        "sourceMap": false,
+        "pretty": true,
+        "baseUrl": ".",
+        "paths": {
+            "*": [
+                "node_modules/*",
+                "typings/*"
+            ]
+        }
     },
     "exclude": [
-        "app/views",
-        "app/public",
-        "node_modules*"
+        "node_moddules"
     ]
 }

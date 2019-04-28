@@ -12,6 +12,9 @@ export default (appInfo: EggAppInfo) => {
 
         // add your special config in here
         sourceUrl: `https://github.com/eggjs/examples/tree/master/${appInfo.name}`,
+
+        appName: appInfo.pkg.name,
+        appVersion: appInfo.pkg.version,
     }
     return config
 }

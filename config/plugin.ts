@@ -1,5 +1,5 @@
 import { EggPlugin } from 'egg'
-import * as path from 'path'
+import path from 'path'
 
 const plugin: EggPlugin = {
 
@@ -13,4 +13,5 @@ const plugin: EggPlugin = {
         path: path.join(__dirname, '../lib/plugin/grpc-client'),
     },
 }
+
 export default plugin
