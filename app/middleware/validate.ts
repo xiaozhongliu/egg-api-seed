@@ -1,9 +1,26 @@
 import { Context } from 'egg'
+import { validate } from 'class-validator'
+import { plainToClass } from 'class-transformer'
+
+import HomeIndexRequest from '../../typings/proto/home/IndexRequest'
+import HomeValidateRequest from '../../typings/proto/home/ValidateRequest'
+const typeMap = new Map([
+    ['Home.index', HomeIndexRequest],
+    ['Home.validate', HomeValidateRequest],
+])
 
 export default async (ctx: Context, next: Function) => {
-    console.log('enter midware')
-    console.log(JSON.stringify(ctx))
-    await next()
-    console.log('exit midware')
-    console.log(JSON.stringify(ctx))
+    const type = typeMap.get(ctx.routerName)
+    const target = plainToClass(type, ctx.query)
+    const errors = await validate(target)
+
+    if (!errors.length) return next()
+
+    ctx.body = {
+        success: false,
+        message: errors.map(error => ({
+            field: error.property,
+            prompt: error.constraints,
+        })),
+    }
 }
