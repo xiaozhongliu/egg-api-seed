@@ -9,8 +9,8 @@ const plugin: EggPlugin = {
     },
     grpcClient: {
         enable: true,
-        package: 'grpc-client',
-        path: path.join(__dirname, '../lib/plugin/grpc-client'),
+        package: 'grpc-client-egg',
+        path: path.join(__dirname, '../lib/plugin/grpc-client-egg'),
     },
 }
 

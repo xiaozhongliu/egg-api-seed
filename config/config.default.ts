@@ -5,10 +5,10 @@ export default (appInfo: EggAppInfo) => {
 
         // override config from framework / plugin
         // use for cookie sign key, should change to your own and keep security
-        keys: appInfo.name + '_1540734627524_2946',
+        keys: `${appInfo.name}_1540734627524_2946`,
 
         // add your egg config in here
-        middleware: [],
+        middleware: ['validate'],
 
         // add your special config in here
         sourceUrl: `https://github.com/eggjs/examples/tree/master/${appInfo.name}`,

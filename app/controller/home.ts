@@ -15,6 +15,10 @@ export default class HomeController extends Controller {
         }
     }
 
+    public async validate() {
+
+    }
+
     public async grpc() {
         const { ctx } = this
         ctx.body = await ctx.helper.getGrpcData(ctx.headers)
