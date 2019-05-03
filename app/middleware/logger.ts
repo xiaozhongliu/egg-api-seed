@@ -9,6 +9,6 @@ export default (app: Application) => {
         if (!logger) {
             logger = ctx.log4js()
         }
-        logger.info({ controller: ctx.routerName })
+        logger.request({ controller: ctx.routerName })
     }
 }

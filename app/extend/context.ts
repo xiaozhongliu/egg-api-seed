@@ -19,23 +19,25 @@ export default {
             networksOrigin.本地连接
         const address = networks.find(network => network.family === 'IPv4')
 
-
-        const layout = {
-            type: 'pattern',
-            pattern: '%m',
-        }
-        const appenders = {
-            dateFile: {
+        function getAppender(type: string) {
+            return {
                 type: 'dateFile',
-                category: 'APP',
-                pattern: 'request.yyyyMMdd.log',
+                category: type,
                 alwaysIncludePattern: true,
-                filename: config.LOG_PATH,
+                pattern: `.yyyyMMdd.log`,
+                filename: config[`${type.toUpperCase()}_LOG_PATH`],
                 layout,
-            },
+            }
+        }
+
+        const layout = { type: 'pattern', pattern: '%m' }
+        const appenders = {
+            common: getAppender('common'),
+            request: getAppender('request'),
         }
         const categories = {
-            default: { appenders: ['dateFile'], level: 'info' },
+            default: { appenders: ['common'], level: config.DEBUG ? 'debug' : 'info' },
+            request: { appenders: ['request'], level: 'info' },
         }
 
         // non prod logs also output to console
@@ -44,44 +46,45 @@ export default {
             appenders.console = { type: 'console', layout }
             categories.default.appenders.push('console')
         }
-
-        // create the log path if it doesn't exist
-        fs.existsSync(config.LOG_PATH) || fs.mkdirSync(config.LOG_PATH)
-
         log4js.configure({
             appenders,
             categories,
             disableClustering: true,
         })
 
-        const logger = log4js.getLogger('APP')
+        const commonLogger = log4js.getLogger('common')
+        const requestLogger = log4js.getLogger('request')
 
-        function log(data: object) {
-            logger.info(JSON.stringify(Object.assign({
+        function mergeData(data: object) {
+            return JSON.stringify({
                 '@appname': config.API_NAME,
                 '@servername': os.hostname(),
                 '@serverip': address.address,
                 '@env': process.env.NODE_ENV,
                 '@timestamp': moment().toISOString(),
                 event: 'TBD',
-            }, data)))
+                ...data,
+            })
         }
 
         return {
-            info(message: string) {
-                log({ message })
+            request(data: object) {
+                requestLogger.info(mergeData(data))
             },
-
-            error(message: string) {
-                log({ message })
+            debug(data: object) {
+                commonLogger.debug(mergeData(data))
             },
-
-            launch(message: string) {
-                log({ message })
+            info(data: object) {
+                commonLogger.info(mergeData(data))
             },
-
-            invoke(data: object) {
-                log(data)
+            warn(data: object) {
+                commonLogger.warn(mergeData(data))
+            },
+            error(data: object) {
+                commonLogger.error(mergeData(data))
+            },
+            fatal(data: object) {
+                commonLogger.fatal(mergeData(data))
             },
         }
     },

@@ -32,7 +32,8 @@ export default (appInfo: EggAppInfo) => {
         },
 
         DEBUG: true,
-        LOG_PATH: `${appInfo.baseDir}/logs/${appInfo.name}/`,
+        COMMON_LOG_PATH: `${appInfo.baseDir}/logs/${appInfo.name}/common`,
+        REQUEST_LOG_PATH: `${appInfo.baseDir}/logs/${appInfo.name}/request`,
     }
     return config
 }
