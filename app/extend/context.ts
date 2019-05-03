@@ -21,14 +21,14 @@ export default {
 
 
         const layout = {
-            type: 'dateFile',
+            type: 'pattern',
             pattern: '%m',
         }
         const appenders = {
             dateFile: {
                 type: 'dateFile',
                 category: 'APP',
-                pattern: 'yyyyMMdd.log',
+                pattern: 'request.yyyyMMdd.log',
                 alwaysIncludePattern: true,
                 filename: config.LOG_PATH,
                 layout,
@@ -55,7 +55,6 @@ export default {
         })
 
         const logger = log4js.getLogger('APP')
-        logger.level = 'debug'
 
         function log(data: object) {
             logger.info(JSON.stringify(Object.assign({

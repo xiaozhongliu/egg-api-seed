@@ -17,14 +17,17 @@ export default (appInfo: EggAppInfo) => {
         appVersion: appInfo.pkg.version,
 
         logger: {
-            appLogName: 'common.log',
-            coreLogName: 'common.log',
-            agentLogName: 'common.log',
-            errorLogName: 'common.log',
+            level: 'INFO',
+            // level: 'DEBUG',
+            // allowDebugAtProd: true,
+            appLogName: 'legacy.log',
+            coreLogName: 'legacy.log',
+            agentLogName: 'legacy.log',
+            errorLogName: 'legacy.log',
         },
         customLogger: {
             scheduleLogger: {
-                file: `common.log`,
+                file: `legacy.log`,
             },
         },
 
