@@ -8,13 +8,28 @@ export default (appInfo: EggAppInfo) => {
         keys: `${appInfo.name}_1540734627524_2946`,
 
         // add your egg config in here
-        middleware: [],
+        middleware: ['logger'],
 
         // add your special config in here
         sourceUrl: `https://github.com/eggjs/examples/tree/master/${appInfo.name}`,
 
         appName: appInfo.pkg.name,
         appVersion: appInfo.pkg.version,
+
+        logger: {
+            appLogName: 'common.log',
+            coreLogName: 'common.log',
+            agentLogName: 'common.log',
+            errorLogName: 'common.log',
+        },
+        customLogger: {
+            scheduleLogger: {
+                file: `common.log`,
+            },
+        },
+
+        DEBUG: true,
+        LOG_PATH: `${appInfo.baseDir}/logs/${appInfo.name}/`,
     }
     return config
 }
