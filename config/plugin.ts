@@ -7,6 +7,7 @@ const plugin: EggPlugin = {
         enable: true,
         package: 'egg-router-plus',
     },
+
     grpcClient: {
         enable: true,
         package: 'grpc-client-egg',

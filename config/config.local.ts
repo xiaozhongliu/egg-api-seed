@@ -3,6 +3,8 @@ import { EggAppConfig, PowerPartial } from 'egg'
 export default () => {
     const config: PowerPartial<EggAppConfig> = {
 
+        DEBUG: true,
+
         grpcClient: {
             clients: [
                 {
