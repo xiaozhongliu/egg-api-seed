@@ -8,7 +8,7 @@ export default (appInfo: EggAppInfo) => {
         keys: `${appInfo.name}_1540734627524_2946`,
 
         // add your egg config in here
-        middleware: ['logger'],
+        middleware: ['logger', 'grpcmeta'],
 
         // add your special config in here
         sourceUrl: `https://github.com/eggjs/examples/tree/master/${appInfo.name}`,

@@ -16,6 +16,9 @@ declare module 'egg' {
             fatal(message: object): void
         }
     }
+    interface Context {
+        grpcmeta
+    }
     interface Service {
         service
     }

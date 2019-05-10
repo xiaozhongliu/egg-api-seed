@@ -30,7 +30,7 @@ async function getMultiTierServices(app: Application, clientConfig: ClientConfig
     try {
         await fs.access(protoDir, constants.F_OK)
     } catch (error) {
-        throw new Error('proto directory not exist')
+        throw new Error('proto directory does not exist')
     }
 
     const protoFileList = await fs.readdir(protoDir)

@@ -22,7 +22,7 @@ export default class HomeController extends Controller {
 
     public async grpc() {
         const { ctx } = this
-        ctx.body = await ctx.helper.getGrpcData(ctx.headers)
+        ctx.body = await ctx.service.greeter.sayHello('world')
     }
 
     public async header() {
