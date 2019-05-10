@@ -3,11 +3,15 @@ import os from 'os'
 import log4js from 'log4js'
 import moment from 'moment'
 import 'moment/locale/zh-cn'
-import { EggAppConfig } from 'egg'
+import { Application, EggAppConfig } from 'egg'
 
 export default {
-    log4js() {
-        const config: EggAppConfig = this.app.config
+
+    get log4js() {
+
+        const app: Application = this.app
+        if (app.customLogger) return app.customLogger
+        const config: EggAppConfig = app.config
 
         // get host ip address
         const networksOrigin = os.networkInterfaces()
@@ -67,7 +71,7 @@ export default {
             })
         }
 
-        return {
+        return app.customLogger = {
             request(data: object) {
                 requestLogger.info(mergeData(data))
             },

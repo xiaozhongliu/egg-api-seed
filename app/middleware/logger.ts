@@ -1,14 +1,17 @@
 import { Application, Context } from 'egg'
-import log4js from 'log4js'
-
-let logger: any
+import moment from 'moment'
+import 'moment/locale/zh-cn'
 
 export default (app: Application) => {
     return async (ctx: Context, next: Function) => {
+        const start = moment()
+
         await next()
-        if (!logger) {
-            logger = ctx.log4js()
-        }
-        logger.request({ controller: ctx.routerName })
+
+        const end = moment()
+        ctx.log4js.request({
+            controller: ctx.routerName,
+            '@duration': end.diff(start, 'milliseconds'),
+        })
     }
 }

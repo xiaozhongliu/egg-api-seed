@@ -5,8 +5,8 @@ import { plainToClass } from 'class-transformer'
 import HomeIndexRequest from '../../typings/proto/home/IndexRequest'
 import HomeValidateRequest from '../../typings/proto/home/ValidateRequest'
 const typeMap = new Map([
-    ['Home.index', HomeIndexRequest],
-    ['Home.validate', HomeValidateRequest],
+    ['HomeController.index', HomeIndexRequest],
+    ['HomeController.validate', HomeValidateRequest],
 ])
 
 export default async (ctx: Context, next: Function) => {
