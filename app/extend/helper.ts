@@ -1,23 +1,6 @@
-import os from 'os'
 import grpc from 'grpc'
 
-// host address
-const networksOrigin = os.networkInterfaces()
-const networks =
-    networksOrigin.eth0 ||
-    networksOrigin.eth1 ||
-    networksOrigin.en0 ||
-    networksOrigin.en1 ||
-    networksOrigin.本地连接
-const address = networks.find(network => network.family === 'IPv4')
-
 export default {
-    getServerInfo() {
-        return {
-            ServerIp: address.address,
-            ServerName: os.hostname(),
-        }
-    },
 
     getGrpcData(headers: Indexed) {
         const metadata = new grpc.Metadata();

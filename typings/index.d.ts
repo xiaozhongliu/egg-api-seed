@@ -3,6 +3,10 @@ import 'egg'
 declare module 'egg' {
     interface Application {
         grpcClient
+        serverInfo: {
+            serverName: string
+            serverIP: string
+        }
         customLogger: {
             request(message: object): void
             debug(message: object): void

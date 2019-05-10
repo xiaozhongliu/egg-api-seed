@@ -31,8 +31,8 @@ export default (appInfo: EggAppInfo) => {
             },
         },
 
-        COMMON_LOG_PATH: `${appInfo.root}/logs/${appInfo.name}/common`,
-        REQUEST_LOG_PATH: `${appInfo.root}/logs/${appInfo.name}/request`,
+        COMMON_LOG_PATH: `${appInfo.root}/logs/${appInfo.pkg.name}/common`,
+        REQUEST_LOG_PATH: `${appInfo.root}/logs/${appInfo.pkg.name}/request`,
     }
     return config
 }

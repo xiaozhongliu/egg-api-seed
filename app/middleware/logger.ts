@@ -5,13 +5,23 @@ import 'moment/locale/zh-cn'
 export default (app: Application) => {
     return async (ctx: Context, next: Function) => {
         const start = moment()
-
         await next()
-
         const end = moment()
-        ctx.log4js.request({
-            controller: ctx.routerName,
+
+        const { log4js, request, response } = ctx
+        log4js.request({
             '@duration': end.diff(start, 'milliseconds'),
+            '@clientip': request.headers['x-forwarded-for'],
+            controller: ctx.routerName,
+            method: request.method,
+            url: request.url,
+            metedata: request.headers,
+            request: {
+                query: request.query,
+                body: request.body,
+            },
+            response: ctx.body,
+            status: response.status,
         })
     }
 }

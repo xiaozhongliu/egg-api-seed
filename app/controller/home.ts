@@ -6,12 +6,13 @@ global.arr = []
 export default class HomeController extends Controller {
 
     public async index() {
-        const { ctx, config } = this
+        const { app, ctx, config } = this
         ctx.body = {
             NodeEnv: process.env.SERVER_ENV,
             AppName: config.appName,
             Version: config.appVersion,
-            ...ctx.helper.getServerInfo(),
+            ServerName: app.serverInfo.serverName,
+            ServerIP: app.serverInfo.serverIP,
         }
     }
 
