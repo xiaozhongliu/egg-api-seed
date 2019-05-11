@@ -9,11 +9,11 @@ declare module 'egg' {
         }
         customLogger: {
             request(message: object): void
-            debug(message: object): void
-            info(message: object): void
-            warn(message: object): void
-            error(message: object): void
-            fatal(message: object): void
+            debug(message: string | object): void
+            info(message: string | object): void
+            warn(message: string | object): void
+            error(message: string | object): void
+            fatal(message: string | object): void
         }
     }
     interface Context {

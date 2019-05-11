@@ -1,5 +1,5 @@
 # egg-api-see
-> An egg api seed project.
+> an egg api seed project.
 
 ## QuickStart
 

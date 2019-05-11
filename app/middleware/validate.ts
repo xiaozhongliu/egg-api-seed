@@ -2,11 +2,11 @@ import { Context } from 'egg'
 import { validate } from 'class-validator'
 import { plainToClass } from 'class-transformer'
 
-import HomeIndexRequest from '../../typings/proto/home/IndexRequest'
-import HomeValidateRequest from '../../typings/proto/home/ValidateRequest'
+import HomeIndexRequest from '../request/home/IndexRequest'
+import HomeValidateRequest from '../request/home/ValidateRequest'
 const typeMap = new Map([
-    ['HomeController.index', HomeIndexRequest],
-    ['HomeController.validate', HomeValidateRequest],
+    ['Home.index', HomeIndexRequest],
+    ['Home.validate', HomeValidateRequest],
 ])
 
 export default async (ctx: Context, next: Function) => {

@@ -8,9 +8,9 @@ export default class HomeController extends Controller {
     public async index() {
         const { app, ctx, config } = this
         ctx.body = {
-            NodeEnv: process.env.SERVER_ENV,
             AppName: config.appName,
             Version: config.appVersion,
+            ServerEnv: process.env.SERVER_ENV,
             ServerName: app.serverInfo.serverName,
             ServerIP: app.serverInfo.serverIP,
         }
@@ -40,7 +40,11 @@ export default class HomeController extends Controller {
 
     public async failover() {
         const { ctx } = this
-        if (Math.random() > 0.5) { ctx.body = 'bingo' } else { ctx.status = 500 }
+        if (Math.random() > 0.5) {
+            ctx.body = 'bingo'
+        } else {
+            ctx.status = 500
+        }
     }
 
     public async pause() {

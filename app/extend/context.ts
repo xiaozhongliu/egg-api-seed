@@ -23,7 +23,7 @@ export default {
         }
         // output logs to console in debug mode
         if (config.DEBUG) {
-            appenders.console = { type: 'console', layout }
+            appenders.console = { type: 'console', category: 'common', layout }
             categories.default.appenders.push('console')
         }
 
@@ -48,8 +48,8 @@ export default {
 
         function mergeData(data: object, level?: LogLevel) {
             return JSON.stringify({
-                '@env': process.env.SERVER_ENV || 'local',
-                '@region': process.env.REGION || 'unknown',
+                '@env': process.env.SERVER_ENV,
+                '@region': process.env.REGION,
                 '@servername': app.serverInfo.serverName,
                 '@serverip': app.serverInfo.serverIP,
                 '@timestamp': moment().toISOString(),
@@ -62,20 +62,25 @@ export default {
             request(data: object) {
                 requestLogger.info(mergeData(data))
             },
-            debug(data: object) {
-                commonLogger.debug(mergeData(data), LogLevel.DEBUG)
+            debug(data: string | object) {
+                const dataObj = typeof data === 'string' ? { message: data } : data
+                commonLogger.debug(mergeData(dataObj, LogLevel.DEBUG))
             },
-            info(data: object) {
-                commonLogger.info(mergeData(data), LogLevel.INFO)
+            info(data: string | object) {
+                const dataObj = typeof data === 'string' ? { message: data } : data
+                commonLogger.info(mergeData(dataObj, LogLevel.INFO))
             },
-            warn(data: object) {
-                commonLogger.warn(mergeData(data), LogLevel.WARN)
+            warn(data: string | object) {
+                const dataObj = typeof data === 'string' ? { message: data } : data
+                commonLogger.warn(mergeData(dataObj, LogLevel.WARN))
             },
-            error(data: object) {
-                commonLogger.error(mergeData(data), LogLevel.ERROR)
+            error(data: string | object) {
+                const dataObj = typeof data === 'string' ? { message: data } : data
+                commonLogger.error(mergeData(dataObj, LogLevel.ERROR))
             },
-            fatal(data: object) {
-                commonLogger.fatal(mergeData(data), LogLevel.FATAL)
+            fatal(data: string | object) {
+                const dataObj = typeof data === 'string' ? { message: data } : data
+                commonLogger.fatal(mergeData(dataObj, LogLevel.FATAL))
             },
         }
     },
