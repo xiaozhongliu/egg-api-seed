@@ -23,8 +23,9 @@ export default {
         }
         // output logs to console in debug mode
         if (config.DEBUG) {
-            appenders.console = { type: 'console', category: 'common', layout }
+            appenders.console = { type: 'console', layout }
             categories.default.appenders.push('console')
+            categories.request.appenders.push('console')
         }
 
         log4js.configure({
